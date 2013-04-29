@@ -1,0 +1,2 @@
+Unidecode==0.04.12
+html2text==3.200.3
