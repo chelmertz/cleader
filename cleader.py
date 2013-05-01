@@ -19,6 +19,7 @@ Python:
 
 """
 
+import datetime
 import html2text
 import json
 import os
@@ -63,7 +64,6 @@ def basic_decorator(args):
         content += "\nBy: "+args['author']
     if 'date' in args and args['date']:
         content += "\n\Written at: "+args['date']
-    import datetime
     content += "\nURL: "+args['url']
     content += "\nFetched at: "+datetime.datetime.now().strftime("%c")
     return content
