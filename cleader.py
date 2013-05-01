@@ -86,7 +86,6 @@ def main():
         elif not url:
             url = arg
         else:
-            print sys.argv
             print >> sys.stderr, "Unkown option: "+arg
             sys.exit(1)
 
@@ -95,7 +94,10 @@ def main():
         sys.exit(1)
 
     try:
-        print cleader(url, save_dir=save_dir)
+        if save_dir:
+            cleader(url, save_dir=save_dir)
+        else:
+            print cleader(url, save_dir=save_dir)
     except Exception as e:
         print >> sys.stderr, e
         sys.exit(1)
