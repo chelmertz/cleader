@@ -1,5 +1,5 @@
 #!/usr/bin/python
-
+# encoding: utf8
 """
 cleader - CLI READER
 
@@ -19,13 +19,13 @@ Python:
 
 """
 
+from __future__ import print_function
 import datetime
 import html2text
 import json
 import os
 import re
 import sys
-import unidecode
 import urllib
 import urllib2
 
@@ -34,13 +34,15 @@ token = 'readability_api_parser_token_here' # retreived for free at readability.
 def cleader(url, token=token, save_dir=None):
     content = Readability(token).request(url)
     plaintext = basic_decorator(content)
+    slugify = lambda value: "".join([x.lower() if x.isalnum() else "_" for x in value])
     if save_dir:
         filename = save_dir+os.sep+slugify(content['title'])+".md"
         if os.path.exists(filename):
             raise Exception("Cowardly refusing to overwrite "+filename)
         with open(filename, 'w') as f:
-            f.write(plaintext)
-    return plaintext
+            f.write(plaintext.encode('utf-8'))
+    else:
+        print(plaintext)
 
 class Readability():
     base_url = 'http://www.readability.com/api/content/v1/parser'
@@ -68,9 +70,9 @@ def basic_decorator(args):
     content += "\nFetched at: "+datetime.datetime.now().strftime("%c")
     return content
 
-def slugify(text):
-    text = unidecode.unidecode(unicode(text)).lower()
-    return re.sub('r\W|\s+', '_', text)
+def _fail(msg):
+    print(msg, file=sys.stderr)
+    sys.exit(1)
 
 def main():
     save_dir = None
@@ -86,21 +88,15 @@ def main():
         elif not url:
             url = arg
         else:
-            print >> sys.stderr, "Unkown option: "+arg
-            sys.exit(1)
+            _fail("Unkown option: "+arg)
 
     if not url:
-        print >> sys.stderr, "Usage: cleader.py [--save[=.]] <url>"
-        sys.exit(1)
+        _fail("Usage: cleader.py [--save[=.]] <url>")
 
     try:
-        if save_dir:
-            cleader(url, save_dir=save_dir)
-        else:
-            print cleader(url, save_dir=save_dir)
+        cleader(url, save_dir=save_dir)
     except Exception as e:
-        print >> sys.stderr, e
-        sys.exit(1)
+        _fail(e)
 
 if __name__ == '__main__':
     main()
